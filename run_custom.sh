@@ -1,0 +1,1 @@
+python scripts/run_custom_dataset.py --config_path ./configs/template2.yaml

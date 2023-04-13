@@ -1,0 +1,11 @@
+# custom config file
+DATASET_NAME: test
+GT_FOLDER: './my_test_data'
+TRACKERS_FOLDER: './my_test_data/result'
+SKIP_SPLIT_FOL: True 
+TRACKER_SUB_FOLDER: ''
+SEQ_INFO:
+  'seq1': 600
+GT_LOC_FORMAT: '{gt_folder}/gt/{seq}.txt'
+CLASSES_TO_EVAL: 
+  - 'pedestrian'

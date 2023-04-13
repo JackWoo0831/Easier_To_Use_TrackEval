@@ -1,0 +1,83 @@
+# for YOLO-Like dir structure 
+# ${data_root}:
+#    |
+#    |___${train_folder_name}(Optional)
+#          |
+#          |____${seq_folder_name}
+#          |          |_______${seq_name}
+#          |                         |____${frame_name}.jpg
+#          |____${gt_folder_name}
+#                     |____${seq_name}.txt
+#    |___${test_folder_name}(Optional)
+#          |
+#          |____${seq_folder_name}
+#          |          |_______${seq_name}
+#          |                         |____${frame_name}.jpg
+#          |____${gt_folder_name}
+#                     |____${seq_name}.txt
+
+# track result MUST OBEY this strcture:
+# result:
+#    |
+#    |_____${train or test}(Optional)
+#                  |
+#                  |_____${tracker_name}(Optional)
+#                                |_______ ${seq_name}.txt
+
+
+
+gt_structure_config: 
+  data_root: '/data/wujiapeng/datasets/my_test_data/'
+  has_split: True
+  train_or_test: test
+  train_folder_name: train
+  test_folder_name: test
+  gt_folder_name: annotations
+  gt_txt_name: '{seq_name}.txt'  # gt.txt, {seq_name}.txt, etc.
+  gt_loc_format: '{data_root}/{split_name}/{gt_folder_name}/{gt_txt_name}' 
+
+tracker_structure_config:
+  trackers_folder: './result'
+  has_split: False
+  split_name: ''
+  has_tracker_name: True 
+  trackers_to_eval:   # None for all
+
+
+# other options
+OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  same as TRACKERS_FOLDER)
+
+SEQ_INFO:  # seq_name: seq_length
+  'seq1': 600
+
+# CLASS configs
+CLASSES_TO_EVAL: 
+  - 'pedestrian'
+  - 'person_on_vehicle'
+  - 'car'
+
+CLASS_NAME_TO_CLASS_ID:
+  'pedestrian': 1
+  'person_on_vehicle': 2
+  'car': 3
+  'bicycle': 4
+  'motorbike': 5,
+  'non_mot_vehicle': 6
+  'static_person': 7
+  'distractor': 8
+  'occluder': 9
+  'occluder_on_ground': 10
+  'occluder_full': 11
+  'reflection': 12
+  'crowd': 13
+
+VALID_CLASS:
+  'pedestrian': 1
+  'person_on_vehicle': 2
+  'car': 3
+
+DISTRACTOR_CLASSES_NAMES:
+  - 'person_on_vehicle'
+  - 'static_person'
+  - 'distractor'
+  - 'reflection'
