@@ -139,6 +139,10 @@ class CustomDataset(_BaseDataset):
         else:
             self.tracker_list = self.config['TRACKERS_TO_EVAL']
 
+        # if no tracker names, set tracker folder as tracker name itself
+        if not self.tracker_structure_config['has_tracker_name']:
+            self.tracker_list = [self.tracker_fol]
+
         if self.config['TRACKER_DISPLAY_NAMES'] is None:
             self.tracker_to_disp = dict(zip(self.tracker_list, self.tracker_list))
         elif (self.config['TRACKERS_TO_EVAL'] is not None) and (
@@ -155,7 +159,10 @@ class CustomDataset(_BaseDataset):
                     raise TrackEvalException('Tracker file not found: ' + tracker + '/' + os.path.basename(curr_file))
             else:
                 for seq in self.seq_list:
-                    curr_file = os.path.join(self.tracker_fol, tracker, self.tracker_sub_fol, seq + '.txt')
+                    if self.tracker_structure_config['has_tracker_name']:
+                        curr_file = os.path.join(self.tracker_fol, tracker, self.tracker_sub_fol, seq + '.txt')
+                    else:
+                        curr_file = os.path.join(self.tracker_fol, self.tracker_sub_fol, seq + '.txt')
                     if not os.path.isfile(curr_file):
                         print('Tracker file not found: ' + curr_file)
                         raise TrackEvalException(
@@ -240,7 +247,10 @@ class CustomDataset(_BaseDataset):
             if is_gt:
                 file = self._get_gt_location(seq)
             else:
-                file = os.path.join(self.tracker_fol, tracker, self.tracker_sub_fol, seq + '.txt')
+                if self.tracker_structure_config['has_tracker_name']:
+                    file = os.path.join(self.tracker_fol, tracker, self.tracker_sub_fol, seq + '.txt')
+                else:
+                    file = os.path.join(self.tracker_fol, self.tracker_sub_fol, seq + '.txt')
 
         # Load raw data from text file
         read_data, ignore_data = self._load_simple_text_file(file, is_zipped=self.data_is_zipped, zip_file=zip_file)

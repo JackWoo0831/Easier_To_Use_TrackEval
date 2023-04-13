@@ -5,16 +5,16 @@
 #          |
 #          |____${seq_name}
 #                     |_______${image_folder}
-#                                    |____${frame_name}.jpg
+#                                    |____${frame_name}
 #                     |_______${gt_folder_name}
-#                                    |____${gt_name}.txt
+#                                    |____${gt_txt_name}
 #    |___${test_folder_name}(Optional)
 #          |
 #          |____${seq_name}
 #                     |_______${image_folder}
-#                                    |____${frame_name}.jpg
+#                                    |____${frame_name}
 #                     |_______${gt_folder_name}   
-#                                    |____${gt_name}.txt
+#                                    |____${gt_txt_name}
 
 
 # track result MUST OBEY this strcture:
@@ -40,7 +40,7 @@ tracker_structure_config:
   trackers_folder: './result'
   has_split: False
   split_name: ''
-  has_tracker_name: True 
+  has_tracker_name: False
   trackers_to_eval:   # None for all
 
 
@@ -61,7 +61,7 @@ CLASS_NAME_TO_CLASS_ID:
   'person_on_vehicle': 2
   'car': 3
   'bicycle': 4
-  'motorbike': 5,
+  'motorbike': 5
   'non_mot_vehicle': 6
   'static_person': 7
   'distractor': 8
