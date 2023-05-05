@@ -1,0 +1,98 @@
+# for YOLO-Like dir structure 
+# ${data_root}:
+#    |
+#    |___${train_folder_name}(Optional)
+#          |
+#          |____${seq_folder_name}
+#          |          |_______${seq_name}
+#          |                         |____${frame_name}
+#          |____${gt_folder_name}
+#                     |____${gt_txt_name}
+#    |___${test_folder_name}(Optional)
+#          |
+#          |____${seq_folder_name}
+#          |          |_______${seq_name}
+#          |                         |____${frame_name}
+#          |____${gt_folder_name}
+#                     |____${gt_txt_name}
+
+# track result MUST OBEY this strcture:
+# result:
+#    |
+#    |_____${train or test}(Optional)
+#                  |
+#                  |_____${tracker_name}(Optional)
+#                                |_______ ${seq_name}.txt
+
+
+
+gt_structure_config: 
+  data_root: '/data/wujiapeng/datasets/VisDrone2019/VisDrone2019/'
+  has_split: True
+  train_or_test: test
+  train_folder_name: VisDrone2019-MOT-train
+  test_folder_name: VisDrone2019-MOT-test-dev
+  gt_folder_name: annotations
+  gt_txt_name: '{seq_name}.txt'  # gt.txt, {seq_name}.txt, etc.
+  gt_loc_format: '{data_root}/{split_name}/{gt_folder_name}/{gt_txt_name}' 
+
+tracker_structure_config:
+  trackers_folder: './result'
+  has_split: False
+  split_name: ''
+  has_tracker_name: False
+  trackers_to_eval:   # None for all
+
+
+# other options
+OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  same as TRACKERS_FOLDER)
+
+SEQ_INFO:  # seq_name: seq_length
+  'uav0000009_03358_v': 219
+  'uav0000077_00720_v': 780
+  'uav0000119_02301_v': 179
+  'uav0000120_04775_v': 1000
+  'uav0000161_00000_v': 308
+  'uav0000188_00000_v': 260
+  'uav0000201_00000_v': 677
+  'uav0000249_00001_v': 360
+  'uav0000249_02688_v': 244
+  'uav0000297_00000_v': 146
+  'uav0000297_00000_v': 373
+  'uav0000306_00230_v': 420
+  'uav0000355_00001_v': 468
+  'uav0000370_00001_v': 265
+
+# CLASS configs
+CLASSES_TO_EVAL: 
+  - 'car'
+
+CLASS_NAME_TO_CLASS_ID:
+  'ignored regions': 0
+  'pedestrian': 1
+  'people': 2
+  'bicycle': 3
+  'car': 4
+  'van': 5
+  'truck': 6
+  'tricycle': 7
+  'awning-tricycle': 8
+  'bus': 9
+  'motor': 10
+  'others': 11
+
+VALID_CLASS:
+  'car': 4
+
+DISTRACTOR_CLASSES_NAMES:
+  - 'ignored regions'
+  - 'pedestrian'
+  - 'people'
+  - 'bicycle'
+  - 'tricycle'
+  - 'awning-tricycle'
+  - 'others'
+  - 'van'
+  - 'truck'
+  - 'bus'
+  - 'motor'

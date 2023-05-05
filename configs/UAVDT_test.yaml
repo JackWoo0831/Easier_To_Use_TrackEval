@@ -27,11 +27,11 @@
 
 
 gt_structure_config: 
-  data_root: '/data/wujiapeng/datasets/MOT17/'
+  data_root: '/data/wujiapeng/datasets/UAVDT/'
   has_split: True
-  train_or_test: train
-  train_folder_name: train
-  test_folder_name: test
+  train_or_test: test
+  train_folder_name: UAV-benchmark-M
+  test_folder_name: UAV-benchmark-M
   gt_folder_name: gt
   gt_txt_name: 'gt.txt'  # gt.txt, {seq_name}.txt, etc.
   gt_loc_format: '{data_root}/{split_name}/{seq_name}/{gt_folder_name}/{gt_txt_name}' 
@@ -48,52 +48,25 @@ tracker_structure_config:
 OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  same as TRACKERS_FOLDER)
 
 SEQ_INFO:  # seq_name: seq_length
-  'MOT17-02-DPM': 600
-  'MOT17-02-FRCNN': 600
-  'MOT17-02-SDP': 600
-  'MOT17-04-DPM': 1050
-  'MOT17-04-FRCNN': 1050
-  'MOT17-04-SDP': 1050
-  'MOT17-05-DPM': 837
-  'MOT17-05-FRCNN': 837
-  'MOT17-05-SDP': 837
-  'MOT17-09-DPM': 525
-  'MOT17-09-FRCNN': 525
-  'MOT17-09-SDP': 525
-  'MOT17-10-DPM': 654
-  'MOT17-10-FRCNN': 654
-  'MOT17-10-SDP': 654
-  'MOT17-11-DPM': 900
-  'MOT17-11-FRCNN': 900
-  'MOT17-11-SDP': 900
-  'MOT17-13-DPM': 750
-  'MOT17-13-FRCNN': 750
-  'MOT17-13-SDP': 750
+  'M0209': 1576
+  'M0403': 514
+  'M0501': 352
+  'M0604': 1079
+  'M0704': 832
+  'M1005': 537
+  'M1009': 604
+  'M1301': 1182
 
 # CLASS configs
 CLASSES_TO_EVAL: 
-  - 'pedestrian'
+  - 'car'
 
 CLASS_NAME_TO_CLASS_ID:
-  'pedestrian': 1
-  'person_on_vehicle': 2
-  'car': 3
-  'bicycle': 4
-  'motorbike': 5
-  'non_mot_vehicle': 6
-  'static_person': 7
-  'distractor': 8
-  'occluder': 9
-  'occluder_on_ground': 10
-  'occluder_full': 11
-  'reflection': 12
-  'crowd': 13
+  'ignored': 0
+  'car': 1
 
 VALID_CLASS:
-  'pedestrian': 1
+  'car': 1
 
 DISTRACTOR_CLASSES_NAMES:
-  - 'person_on_vehicle'
-  - 'static_person'
-  - 'distractor'
-  - 'reflection'
+  - 'ignored'
