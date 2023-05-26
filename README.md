@@ -9,7 +9,36 @@
 
 ***仅支持2D MOT数据集***
 
-## II. 使用方法
+## II. 当前数据集支持
+
+当前支持一些数据集, MOT17, UAVDT和VisDrone. 可以参阅`./configs/`里面的文件
+
+### 1. MOT17
+
+MOT17只有训练集有标注. 如果您想用`MOT17-half`做测试, 可能需要修改一些代码.
+
+使用MOT17, 需要修改`./configs/MOT17_train.yaml`的`data_root`参数, 设置为您的数据集路径, 然后运行:
+
+```bash
+python scripts/run_custom_dataset.py --config_path configs/MOT17_trian.yaml
+```
+
+### 2. VisDrone-MOT
+
+注意, MOTA等多目标跟踪指标只支持单类评测, 或者说只有单类评测才是比较科学的. 官方VisDrone要求跟踪五类, 因此需要
+首先整理VisDrone真值, 让其只有两类, 运行:
+
+```bash
+python scripts/merge_visdrone_categories.py
+```
+
+然后同理, 在`./configs/`里面的文件设置自己的路径.
+
+### 3. UAVDT 
+
+同理, 只是UAVDT需要自行划分训练集与测试集, 需要修改文件当中的`SEQ_INFO`信息.
+
+## III. 自定义数据集的使用方法
 
 ### 目录结构
 
@@ -189,7 +218,7 @@ result
 bash run_custom.sh
 ```
 
-## 一个示例
+## IV. 一个示例
 
 
 下面用一个小demo来演示一下. 我随便选取了MOT17数据集中的一个txt文件, 作为真值, 同时作为我的模型的跟踪结果. 
