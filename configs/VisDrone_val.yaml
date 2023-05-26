@@ -30,14 +30,14 @@ gt_structure_config:
   data_root: '/data/wujiapeng/datasets/VisDrone2019/VisDrone2019/'
   has_split: True
   train_or_test: test
-  train_folder_name: merge_cls_gt
-  test_folder_name: merge_cls_gt
+  train_folder_name: merge_cls_gt_val
+  test_folder_name: merge_cls_gt_val
   gt_folder_name: annotations
   gt_txt_name: '{seq_name}.txt'  # gt.txt, {seq_name}.txt, etc.
   gt_loc_format: '{data_root}/{split_name}/{gt_folder_name}/{gt_txt_name}' 
 
 tracker_structure_config:
-  trackers_folder: './result/sort_25_05_09_07'
+  trackers_folder: './result/visdrone_05_21_22_22'
   has_split: False
   split_name: ''
   has_tracker_name: False
@@ -48,20 +48,13 @@ tracker_structure_config:
 OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  same as TRACKERS_FOLDER)
 
 SEQ_INFO:  # seq_name: seq_length
-  'uav0000009_03358_v': 219
-  'uav0000077_00720_v': 780
-  'uav0000119_02301_v': 179
-  'uav0000120_04775_v': 1000
-  'uav0000161_00000_v': 308
-  'uav0000188_00000_v': 260
-  'uav0000201_00000_v': 677
-  'uav0000249_00001_v': 360
-  'uav0000249_02688_v': 244
-  'uav0000297_00000_v': 146
-  'uav0000297_00000_v': 373
-  'uav0000306_00230_v': 420
-  'uav0000355_00001_v': 468
-  'uav0000370_00001_v': 265
+  'uav0000086_00000_v': 464
+  'uav0000117_02622_v': 349
+  'uav0000137_00458_v': 233
+  'uav0000182_00000_v': 363
+  'uav0000268_05773_v': 978
+  'uav0000305_00000_v': 184
+  'uav0000339_00001_v': 275
 
 # CLASS configs
 CLASSES_TO_EVAL: 
@@ -77,4 +70,5 @@ VALID_CLASS:
 DISTRACTOR_CLASSES_NAMES:
   - 'ignored regions'
 
-# python scripts/run_custom_dataset.py --config_path configs/VisDrone_test_dev.yaml
+
+# python scripts/run_custom_dataset.py --config_path configs/VisDrone_val.yaml

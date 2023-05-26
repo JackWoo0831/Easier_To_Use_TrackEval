@@ -37,7 +37,7 @@ gt_structure_config:
   gt_loc_format: '{data_root}/{split_name}/{seq_name}/{gt_folder_name}/{gt_txt_name}' 
 
 tracker_structure_config:
-  trackers_folder: './result'
+  trackers_folder: './result/uavmot_09_05_14_55'
   has_split: False
   split_name: ''
   has_tracker_name: False
@@ -48,14 +48,16 @@ tracker_structure_config:
 OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  same as TRACKERS_FOLDER)
 
 SEQ_INFO:  # seq_name: seq_length
-  'M0209': 1576
-  'M0403': 514
-  'M0501': 352
+  'M0101': 407
+  'M0202': 291
+  'M0203': 1007
+  'M0402': 410
+  # 'M0601': 372
   'M0604': 1079
-  'M0704': 832
-  'M1005': 537
-  'M1009': 604
-  'M1301': 1182
+  'M1002': 660
+  'M1003': 1346
+  'M1008': 569
+  'M1202': 472
 
 # CLASS configs
 CLASSES_TO_EVAL: 
