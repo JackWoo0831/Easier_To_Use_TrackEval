@@ -27,17 +27,17 @@
 
 
 gt_structure_config: 
-  data_root: '/data/wujiapeng/datasets/MOT17/'
+  data_root: '/data/wujiapeng/datasets/AIRMOT'
   has_split: True
-  train_or_test: train
-  train_folder_name: train
-  test_folder_name: test
+  train_or_test: test
+  train_folder_name: trainData
+  test_folder_name: trainData
   gt_folder_name: gt
-  gt_txt_name: 'gt.txt'  # gt.txt, {seq_name}.txt, etc.
-  gt_loc_format: '{data_root}/{split_name}/{seq_name}/{gt_folder_name}/{gt_txt_name}' 
+  gt_txt_name: '{seq_name}.txt'  # gt.txt, {seq_name}.txt, etc.
+  gt_loc_format: '{data_root}/{split_name}/{gt_folder_name}/{gt_txt_name}' 
 
 tracker_structure_config:
-  trackers_folder: './result/mot17_result3'
+  trackers_folder: './result/airmot'
   has_split: False
   split_name: ''
   has_tracker_name: False
@@ -48,52 +48,35 @@ tracker_structure_config:
 OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  same as TRACKERS_FOLDER)
 
 SEQ_INFO:  # seq_name: seq_length
-  'MOT17-02-DPM': 600
-  'MOT17-02-FRCNN': 600
-  'MOT17-02-SDP': 600
-  'MOT17-04-DPM': 1050
-  'MOT17-04-FRCNN': 1050
-  'MOT17-04-SDP': 1050
-  'MOT17-05-DPM': 837
-  'MOT17-05-FRCNN': 837
-  'MOT17-05-SDP': 837
-  'MOT17-09-DPM': 525
-  'MOT17-09-FRCNN': 525
-  'MOT17-09-SDP': 525
-  'MOT17-10-DPM': 654
-  'MOT17-10-FRCNN': 654
-  'MOT17-10-SDP': 654
-  'MOT17-11-DPM': 900
-  'MOT17-11-FRCNN': 900
-  'MOT17-11-SDP': 900
-  'MOT17-13-DPM': 750
-  'MOT17-13-FRCNN': 750
-  'MOT17-13-SDP': 750
+  # '7': 143
+  # '11': 143
+  '20': 326
+  # '22': 326
+  # '27': 326
+  # '35': 326
+  # '36': 326
+  # '41': 327
+  # '46': 327
+  # '69': 72
+  # '70': 72
+  # '75': 327
+  '77': 70
 
 # CLASS configs
 CLASSES_TO_EVAL: 
-  - 'pedestrian'
+  - 'plane'
+  - 'ship'
 
 CLASS_NAME_TO_CLASS_ID:
-  'pedestrian': 1
-  'person_on_vehicle': 2
-  'car': 3
-  'bicycle': 4
-  'motorbike': 5
-  'non_mot_vehicle': 6
-  'static_person': 7
-  'distractor': 8
-  'occluder': 9
-  'occluder_on_ground': 10
-  'occluder_full': 11
-  'reflection': 12
-  'crowd': 13
+  'ignored': 0
+  'plane': 1
+  'ship': 2
 
 VALID_CLASS:
-  'pedestrian': 1
+  'plane': 1
+  'ship': 2
 
 DISTRACTOR_CLASSES_NAMES:
-  - 'person_on_vehicle'
-  - 'static_person'
-  - 'distractor'
-  - 'reflection'
+  - 'ignored'
+
+# python scripts/run_custom_dataset.py --config_path configs/AIRMOT.yaml

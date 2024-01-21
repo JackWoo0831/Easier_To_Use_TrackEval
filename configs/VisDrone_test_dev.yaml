@@ -37,7 +37,7 @@ gt_structure_config:
   gt_loc_format: '{data_root}/{split_name}/{gt_folder_name}/{gt_txt_name}' 
 
 tracker_structure_config:
-  trackers_folder: './result/sort_25_05_09_07'
+  trackers_folder: './result/qdtrack/result_txt'
   has_split: False
   split_name: ''
   has_tracker_name: False
@@ -49,7 +49,10 @@ OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  sa
 
 SEQ_INFO:  # seq_name: seq_length
   'uav0000009_03358_v': 219
+  'uav0000073_00600_v': 328
+  'uav0000073_04464_v': 312
   'uav0000077_00720_v': 780
+  'uav0000088_00290_v': 296
   'uav0000119_02301_v': 179
   'uav0000120_04775_v': 1000
   'uav0000161_00000_v': 308
@@ -58,7 +61,7 @@ SEQ_INFO:  # seq_name: seq_length
   'uav0000249_00001_v': 360
   'uav0000249_02688_v': 244
   'uav0000297_00000_v': 146
-  'uav0000297_00000_v': 373
+  'uav0000297_02761_v': 373
   'uav0000306_00230_v': 420
   'uav0000355_00001_v': 468
   'uav0000370_00001_v': 265

@@ -37,7 +37,7 @@ gt_structure_config:
   gt_loc_format: '{data_root}/{split_name}/{gt_folder_name}/{gt_txt_name}' 
 
 tracker_structure_config:
-  trackers_folder: './result/visdrone_05_21_22_22'
+  trackers_folder: './result/qdtrack/result_txt'
   has_split: False
   split_name: ''
   has_tracker_name: False

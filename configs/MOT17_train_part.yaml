@@ -27,17 +27,17 @@
 
 
 gt_structure_config: 
-  data_root: '/data/wujiapeng/datasets/UAVDT/'
+  data_root: '/data/wujiapeng/datasets/MOT17/'
   has_split: True
-  train_or_test: test
-  train_folder_name: UAV-benchmark-M
-  test_folder_name: UAV-benchmark-M
+  train_or_test: train
+  train_folder_name: train
+  test_folder_name: test
   gt_folder_name: gt
   gt_txt_name: 'gt.txt'  # gt.txt, {seq_name}.txt, etc.
   gt_loc_format: '{data_root}/{split_name}/{seq_name}/{gt_folder_name}/{gt_txt_name}' 
 
 tracker_structure_config:
-  trackers_folder: './result/fairmot/fairmot_depth_20231212_uavdt_epoch20_none_comp'
+  trackers_folder: './result/after_interp'
   has_split: False
   split_name: ''
   has_tracker_name: False
@@ -48,29 +48,54 @@ tracker_structure_config:
 OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  same as TRACKERS_FOLDER)
 
 SEQ_INFO:  # seq_name: seq_length
-  'M0101': 407
-  'M0202': 291
-  'M0203': 1007
-  'M0402': 410
-  # 'M0601': 372
-  'M0604': 1079
-  'M1002': 660
-  'M1003': 1346
-  'M1008': 569
-  'M1202': 472
+#   'MOT17-02-DPM': 600
+  'MOT17-02-FRCNN': 600
+#   'MOT17-02-SDP': 600
+#   'MOT17-04-DPM': 1050
+  'MOT17-04-FRCNN': 1050
+#   'MOT17-04-SDP': 1050
+#   'MOT17-05-DPM': 837
+  'MOT17-05-FRCNN': 837
+#   'MOT17-05-SDP': 837
+#   'MOT17-09-DPM': 525
+  'MOT17-09-FRCNN': 525
+#   'MOT17-09-SDP': 525
+#   'MOT17-10-DPM': 654
+#   'MOT17-10-FRCNN': 654
+#   'MOT17-10-SDP': 654
+#   'MOT17-11-DPM': 900
+#   'MOT17-11-FRCNN': 900
+#   'MOT17-11-SDP': 900
+#   'MOT17-13-DPM': 750
+#   'MOT17-13-FRCNN': 750
+#   'MOT17-13-SDP': 750
 
 # CLASS configs
 CLASSES_TO_EVAL: 
-  - 'car'
+  - 'pedestrian'
 
 CLASS_NAME_TO_CLASS_ID:
-  'ignored': 0
-  'car': 1
+  'pedestrian': 1
+  'person_on_vehicle': 2
+  'car': 3
+  'bicycle': 4
+  'motorbike': 5
+  'non_mot_vehicle': 6
+  'static_person': 7
+  'distractor': 8
+  'occluder': 9
+  'occluder_on_ground': 10
+  'occluder_full': 11
+  'reflection': 12
+  'crowd': 13
 
 VALID_CLASS:
-  'car': 1
+  'pedestrian': 1
 
 DISTRACTOR_CLASSES_NAMES:
-  - 'ignored'
+  - 'person_on_vehicle'
+  - 'static_person'
+  - 'distractor'
+  - 'reflection'
 
-# python scripts/run_custom_dataset.py --config_path configs/UAVDT_test.yaml
+# python scripts/run_custom_dataset.py --config_path configs/MOT17_train_part.yaml

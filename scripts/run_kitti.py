@@ -3,6 +3,7 @@
 
 Run example:
 run_kitti.py --USE_PARALLEL False --METRICS Hota --TRACKERS_TO_EVAL CIWT
+python scripts/run_kitti.py --USE_PARALLEL False --GT_FOLDER /data/wujiapeng/datasets/KITTI/training --TRACKERS_FOLDER ./result/KITTI --TRACKER_SUB_FOLDER ''
 
 Command Line Arguments: Defaults, # Comments
     Eval arguments:
