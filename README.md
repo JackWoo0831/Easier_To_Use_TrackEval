@@ -1,5 +1,11 @@
 # Easier to use TrackEval 
 
+<div align="center">
+
+**Language**: 简体中文 | [English](README_ENG.md)
+
+</div>
+
 ## 😆O. 最近更新
 
 ***2024.12.14***: 重新整理整个框架, 并解决了过去没有考虑数据集中ignore region, truncation和occlusion导致FP过高(MOTA过低)的问题[This Issue](https://github.com/JackWoo0831/Easier_To_Use_TrackEval/issues/13#issuecomment-2540488858), 以及支持多类别评测[This Issue](https://github.com/JackWoo0831/Easier_To_Use_TrackEval/issues/19)

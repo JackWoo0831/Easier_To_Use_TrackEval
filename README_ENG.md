@@ -1,5 +1,14 @@
 # Easier to use TrackEval 
+
+<div align="center">
+
+**Language**: English | [简体中文](README.md)
+
+</div>
+
 ##  😆 O. Recent updates
+
+
 ***December 14, 2024***: Reorganized the entire framework and resolved the issue of not considering ignore regions in the dataset in the past, Truncation and occlusion lead to the problem of high FP (low MOTA) [This Issue]（ https://github.com/JackWoo0831/Easier_To_Use_TrackEval/issues/13#issuecomment -2540488858), as well as support for multi category reviews [This Issue]（ https://github.com/JackWoo0831/Easier_To_Use_TrackEval/issues/19 )
 
 
