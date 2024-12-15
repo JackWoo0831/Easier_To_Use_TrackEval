@@ -93,7 +93,7 @@ ZERO_MARK:  # in gt annotation, the 'score' column (idx 6) indicates whether to 
 
 CROWD_IGNORE_REGION:
   'enabled': true
-  'col_idx': 7  # in UAVDT the class (col 8 in annotation) 0 indicates the ignored region
+  'col_idx': 8  # in UAVDT the class (col 8 in annotation) 0 indicates the ignored region
   'class_id': 
     - '0'  # list format. and the class is str type (because the txt is read as str)
 
