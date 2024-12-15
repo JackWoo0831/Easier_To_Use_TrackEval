@@ -63,18 +63,14 @@ SEQ_INFO:  # seq_name: seq_length
   '77': 70
 
 # CLASS configs
-CLASSES_TO_EVAL: 
-  - 'plane'
-  - 'ship'
-
 CLASS_NAME_TO_CLASS_ID:
   'ignored': 0
   'plane': 1
   'ship': 2
 
-VALID_CLASS:
-  'plane': 1
-  'ship': 2
+CLASSES_TO_EVAL: 
+  - 'plane'
+  - 'ship'
 
 DISTRACTOR_CLASSES_NAMES:
   - 'ignored'

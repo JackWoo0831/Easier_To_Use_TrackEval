@@ -51,11 +51,6 @@ SEQ_INFO:  # seq_name: seq_length
   'seq1': 600
 
 # CLASS configs
-CLASSES_TO_EVAL: 
-  - 'pedestrian'
-  - 'person_on_vehicle'
-  - 'car'
-
 CLASS_NAME_TO_CLASS_ID:
   'pedestrian': 1
   'person_on_vehicle': 2
@@ -71,13 +66,45 @@ CLASS_NAME_TO_CLASS_ID:
   'reflection': 12
   'crowd': 13
 
-VALID_CLASS:
-  'pedestrian': 1
-  'person_on_vehicle': 2
-  'car': 3
+CLASSES_TO_EVAL: 
+  - 'pedestrian'
+  - 'person_on_vehicle'
+  - 'car'
 
 DISTRACTOR_CLASSES_NAMES:
   - 'person_on_vehicle'
   - 'static_person'
   - 'distractor'
   - 'reflection'
+
+
+# zero mark, crowd (i.e. ignored region), occlusion and truncation settings
+# the predicted bounding box in this region or situation can be omitted to get a reasonable results
+
+ZERO_MARK:  # in gt annotation, the 'score' column (idx 6) indicates whether to consider the bbox
+  'enabled': true  # if is 0, then dropped the gt bbox
+
+CROWD_IGNORE_REGION:
+  'enabled': false
+  'col_idx': 7  # in Visdrone the class (col 7 in annotation) 0 indicates the ignored region
+  'class_id': 
+    - '0'  # list format. and the class is str type (because the txt is read as str)
+
+TRUNCATION: # indicates the degree of object parts appears outside a frame
+  'enabled': false  # whether filter the high-trunction objects
+  'thresh': 0  # when > 0, ommited
+
+OCCLUSION:  # indicates the fraction of objects being occluded
+  'enabled': false  # whether filter the high-trunction objects
+  'thresh': 1  # when > 1, ommited
+
+COL_IDX_MAP:  # in gt file and tracking results file, the meaning of each cols. key: info, value: col idx
+  'time': 0
+  'id': 1 
+  'bbox_start': 2
+  'bbox_end': 5
+  'score': 6
+  'class': 7
+  'visibility': 8
+
+FRAME_START_IDX: 1  # in a seq, the first frame is frame 0 or frame 1 

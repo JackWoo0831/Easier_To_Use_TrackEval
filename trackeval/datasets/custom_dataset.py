@@ -105,12 +105,8 @@ class CustomDataset(_BaseDataset):
         self.output_sub_fol = self.config['OUTPUT_SUB_FOLDER']
 
         # Get classes to eval
-        self.valid_classes = self.config['VALID_CLASS']
-
-        self.class_list = [cls.lower() if cls.lower() in self.valid_classes else None
-                           for cls in self.config['CLASSES_TO_EVAL']]
-        if not all(self.class_list):
-            raise TrackEvalException('Attempted to evaluate an invalid class. Only pedestrian class is valid.')
+        self.class_list = [cls.lower() for cls in self.config['CLASSES_TO_EVAL']]
+        
         self.class_name_to_class_id = self.config['CLASS_NAME_TO_CLASS_ID']
 
         self.valid_class_numbers = list(self.class_name_to_class_id.values())
@@ -168,6 +164,40 @@ class CustomDataset(_BaseDataset):
                         raise TrackEvalException(
                             'Tracker file not found: ' + tracker + '/' + self.tracker_sub_fol + '/' + os.path.basename(
                                 curr_file))
+                    
+        # set truncation filter setting
+        self.filter_truncation, self.truncation_thresh = False, 1e5
+        if 'TRUNCATION' in self.config.keys() and self.config['TRUNCATION']['enabled']:
+            self.filter_truncation = True
+            self.truncation_thresh = self.config['TRUNCATION']['thresh']
+        
+
+        # set occlusion filter setting
+        self.filter_occlusion, self.occlusion_thresh = False, 1e5
+        if 'OCCLUSION' in self.config.keys() and self.config['OCCLUSION']['enabled']:
+            self.filter_occlusion = True 
+            self.occlusion_thresh = self.config['OCCLUSION']['thresh']
+
+        # set zero mark setting
+        self.zero_mark = False 
+        if 'ZERO_MARK' in self.config.keys() and self.config['ZERO_MARK']['enabled']:
+            self.zero_mark = True 
+
+        # set ignored region
+        self.filter_ignored_region = False 
+        if 'CROWD_IGNORE_REGION' in self.config.keys() and self.config['CROWD_IGNORE_REGION']['enabled']:
+            self.filter_ignored_region = True 
+
+
+        # set column index map 
+        self.col_idx_map = self.config['COL_IDX_MAP']
+
+        # set if consider the tracking results as a SINGLE class
+        self.as_single_class, self.as_single_class_id = False, 0 
+        if 'AS_SINGLE_CLASS' in self.config.keys() and self.config['AS_SINGLE_CLASS']['enabled']:
+            self.as_single_class = True 
+            self.as_single_class_id = self.config['AS_SINGLE_CLASS']['single_class_id']
+
 
     def get_display_name(self, tracker):
         return self.tracker_to_disp[tracker]
@@ -252,8 +282,22 @@ class CustomDataset(_BaseDataset):
                 else:
                     file = os.path.join(self.tracker_fol, self.tracker_sub_fol, seq + '.txt')
 
+        # Crowd, i.e., ignored regions
+        if is_gt:
+            if self.filter_ignored_region:
+                crowd_ignore_filter = {self.config['CROWD_IGNORE_REGION']['col_idx']: self.config['CROWD_IGNORE_REGION']['class_id']}
+            else:
+                crowd_ignore_filter = None
+        else:
+            crowd_ignore_filter = None
+
         # Load raw data from text file
-        read_data, ignore_data = self._load_simple_text_file(file, is_zipped=self.data_is_zipped, zip_file=zip_file)
+        read_data, ignore_data = self._load_simple_text_file(file, 
+                                                             time_col=self.col_idx_map['time'], 
+                                                             id_col=self.col_idx_map['id'], 
+                                                             remove_negative_ids=True, 
+                                                             crowd_ignore_filter=crowd_ignore_filter, 
+                                                             is_zipped=self.data_is_zipped, zip_file=zip_file)
 
         # Convert data to required format
         num_timesteps = self.seq_lengths[seq]
@@ -265,7 +309,7 @@ class CustomDataset(_BaseDataset):
         raw_data = {key: [None] * num_timesteps for key in data_keys}
 
         # Check for any extra time keys
-        current_time_keys = [str( t+ 1) for t in range(num_timesteps)]
+        current_time_keys = [str(t + 1) for t in range(num_timesteps)]
         extra_time_keys = [x for x in read_data.keys() if x not in current_time_keys]
         if len(extra_time_keys) > 0:
             if is_gt:
@@ -277,55 +321,65 @@ class CustomDataset(_BaseDataset):
                     [str(x) + ', ' for x in extra_time_keys]))
 
         for t in range(num_timesteps):
-            time_key = str(t+1)
+            time_key = str(t + self.config['FRAME_START_IDX'])
+
             if time_key in read_data.keys():
-                try:
-                    time_data = np.asarray(read_data[time_key], dtype=np.float)
-                except ValueError:
-                    if is_gt:
-                        raise TrackEvalException(
-                            'Cannot convert gt data for sequence %s to float. Is data corrupted?' % seq)
-                    else:
-                        raise TrackEvalException(
-                            'Cannot convert tracking data from tracker %s, sequence %s to float. Is data corrupted?' % (
-                                tracker, seq))
-                try:
-                    raw_data['dets'][t] = np.atleast_2d(time_data[:, 2:6])
-                    raw_data['ids'][t] = np.atleast_1d(time_data[:, 1]).astype(int)
-                except IndexError:
-                    if is_gt:
-                        err = 'Cannot load gt data from sequence %s, because there is not enough ' \
-                              'columns in the data.' % seq
-                        raise TrackEvalException(err)
-                    else:
-                        err = 'Cannot load tracker data from tracker %s, sequence %s, because there is not enough ' \
-                              'columns in the data.' % (tracker, seq)
-                        raise TrackEvalException(err)
-                if time_data.shape[1] >= 8:
-                    raw_data['classes'][t] = np.atleast_1d(time_data[:, 7]).astype(int)
-                else:
-                    if not is_gt:
-                        raw_data['classes'][t] = np.ones_like(raw_data['ids'][t])
-                    else:
-                        raise TrackEvalException(
-                            'GT data is not in a valid format, there is not enough rows in seq %s, timestep %i.' % (
-                                seq, t))
+
+                time_data = np.asarray(read_data[time_key], dtype=np.float)
+                
+                raw_data['dets'][t] = np.atleast_2d(time_data[:, self.col_idx_map['bbox_start']: self.col_idx_map['bbox_end'] + 1])
+                raw_data['ids'][t] = np.atleast_1d(time_data[:, self.col_idx_map['id']]).astype(int)
+                
+                raw_data['classes'][t] = np.atleast_1d(time_data[:, self.col_idx_map['class']]).astype(int)
+                
+
                 if is_gt:
-                    gt_extras_dict = {'zero_marked': np.atleast_1d(time_data[:, 6].astype(int))}
+                    # add zero mark, occlusion and truncation info
+                    gt_extras_dict = dict()
+
+                    if self.zero_mark:
+                        gt_extras_dict.update({'zero_marked': np.atleast_1d(time_data[:, self.col_idx_map['score']].astype(int))})
+
+                    if self.filter_truncation:
+                        gt_extras_dict.update({'truncation': np.atleast_1d(time_data[:, self.col_idx_map['truncation']].astype(int))})
+
+                    if self.filter_occlusion:
+                        gt_extras_dict.update({'occlusion': np.atleast_1d(time_data[:, self.col_idx_map['occlusion']].astype(int))})
+                    
                     raw_data['gt_extras'][t] = gt_extras_dict
+
                 else:
-                    raw_data['tracker_confidences'][t] = np.atleast_1d(time_data[:, 6])
+                    raw_data['tracker_confidences'][t] = np.atleast_1d(time_data[:, self.col_idx_map['score']])
             else:
                 raw_data['dets'][t] = np.empty((0, 4))
                 raw_data['ids'][t] = np.empty(0).astype(int)
                 raw_data['classes'][t] = np.empty(0).astype(int)
+
                 if is_gt:
-                    gt_extras_dict = {'zero_marked': np.empty(0)}
+                    gt_extras_dict = dict()
+
+                    if self.zero_mark:
+                        gt_extras_dict.update({'zero_marked': np.empty(0)})
+
+                    if self.filter_truncation:
+                        gt_extras_dict.update({'truncation': np.empty(0)})
+
+                    if self.filter_occlusion:
+                        gt_extras_dict.update({'occlusion': np.empty(0)})
+                    
                     raw_data['gt_extras'][t] = gt_extras_dict
                 else:
                     raw_data['tracker_confidences'][t] = np.empty(0)
+
+            # ignored regions
             if is_gt:
-                raw_data['gt_crowd_ignore_regions'][t] = np.empty((0, 4))
+
+                if time_key in ignore_data.keys():
+                    time_ignore = np.asarray(ignore_data[time_key], dtype=np.float)
+                    raw_data['gt_crowd_ignore_regions'][t] = np.atleast_2d(time_ignore[:, self.col_idx_map['bbox_start']: self.col_idx_map['bbox_end'] + 1])
+                
+                else:
+                    raw_data['gt_crowd_ignore_regions'][t] = np.empty((0, 4))
 
         if is_gt:
             key_map = {'ids': 'gt_ids',
@@ -371,7 +425,12 @@ class CustomDataset(_BaseDataset):
         self._check_unique_ids(raw_data)
 
         distractor_class_names = self.config['DISTRACTOR_CLASSES_NAMES']
-        distractor_classes = [self.class_name_to_class_id[x] for x in distractor_class_names]
+        
+        if distractor_class_names is not None:
+            distractor_classes = [self.class_name_to_class_id[x] for x in distractor_class_names]
+        else:
+            distractor_classes = []
+
         cls_id = self.class_name_to_class_id[cls]
 
         data_keys = ['gt_ids', 'tracker_ids', 'gt_dets', 'tracker_dets', 'tracker_confidences', 'similarity_scores']
@@ -382,33 +441,45 @@ class CustomDataset(_BaseDataset):
         num_tracker_dets = 0
         for t in range(raw_data['num_timesteps']):
 
-            # Get all data
-            gt_ids = raw_data['gt_ids'][t]
-            gt_dets = raw_data['gt_dets'][t]
-            gt_classes = raw_data['gt_classes'][t]
-            gt_zero_marked = raw_data['gt_extras'][t]['zero_marked']
+            # Only extract relevant dets for this class for preproc and eval (cls + distractor classes)
+            gt_class_mask = np.sum([raw_data['gt_classes'][t] == c for c in [cls_id] + distractor_classes], axis=0)
+            gt_class_mask = gt_class_mask.astype(np.bool)
+            gt_ids = raw_data['gt_ids'][t][gt_class_mask]
+            gt_dets = raw_data['gt_dets'][t][gt_class_mask]
+            gt_classes = raw_data['gt_classes'][t][gt_class_mask]
 
-            tracker_ids = raw_data['tracker_ids'][t]
-            tracker_dets = raw_data['tracker_dets'][t]
-            tracker_classes = raw_data['tracker_classes'][t]
-            tracker_confidences = raw_data['tracker_confidences'][t]
-            similarity_scores = raw_data['similarity_scores'][t]
+            if self.zero_mark:
+                gt_zero_marked = raw_data['gt_extras'][t]['zero_marked'][gt_class_mask]
+            else:
+                gt_zero_marked = np.ones_like(gt_classes).astype(int)
+
+            if self.filter_occlusion:
+                gt_occlusion = raw_data['gt_extras'][t]['occlusion'][gt_class_mask]
+            else:
+                gt_occlusion = np.zeros_like(gt_classes).astype(int)
+
+            if self.filter_truncation:
+                gt_truncation = raw_data['gt_extras'][t]['truncation'][gt_class_mask]
+            else:
+                gt_truncation = np.zeros_like(gt_classes).astype(int)
+
+            # if set as single class in evaluation, consider ALL tracking results as specified SINGLE class
+            
+            tracker_cls_id = cls_id if not self.as_single_class else self.as_single_class_id
+
+            tracker_class_mask = np.atleast_1d(raw_data['tracker_classes'][t] == tracker_cls_id)
+            tracker_class_mask = tracker_class_mask.astype(np.bool)
+            tracker_ids = raw_data['tracker_ids'][t][tracker_class_mask]
+            tracker_dets = raw_data['tracker_dets'][t][tracker_class_mask]
+            tracker_confidences = raw_data['tracker_confidences'][t][tracker_class_mask]
+            similarity_scores = raw_data['similarity_scores'][t][gt_class_mask, :][:, tracker_class_mask]
+        
 
             # Match tracker and gt dets (with hungarian algorithm) and remove tracker dets which match with gt dets
             # which are labeled as belonging to a distractor class.
-            to_remove_tracker = np.array([], np.int)
+            to_remove_matched = np.array([], np.int)
+            unmatched_indices = np.arange(tracker_ids.shape[0])
             if self.do_preproc and gt_ids.shape[0] > 0 and tracker_ids.shape[0] > 0:
-
-                # Check all classes are valid:
-                invalid_classes = np.setdiff1d(np.unique(gt_classes), self.valid_class_numbers)
-                if len(invalid_classes) > 0:
-                    print(' '.join([str(x) for x in invalid_classes]))
-                    raise(TrackEvalException('Attempting to evaluate using invalid gt classes. '
-                                             'This warning only triggers if preprocessing is performed, '
-                                             'e.g. not for MOT15 or where prepropressing is explicitly disabled. '
-                                             'Please either check your gt data, or disable preprocessing. '
-                                             'The following invalid classes were found in timestep ' + str(t) + ': ' +
-                                             ' '.join([str(x) for x in invalid_classes])))
 
                 matching_scores = similarity_scores.copy()
                 matching_scores[matching_scores < 0.5 - np.finfo('float').eps] = 0
@@ -418,8 +489,26 @@ class CustomDataset(_BaseDataset):
                 match_cols = match_cols[actually_matched_mask]
 
                 is_distractor_class = np.isin(gt_classes[match_rows], distractor_classes)
-                to_remove_tracker = match_cols[is_distractor_class]
+                
+                is_occluded_or_truncated = np.logical_or(
+                    gt_occlusion[match_rows] > self.occlusion_thresh + np.finfo('float').eps,
+                    gt_truncation[match_rows] > self.truncation_thresh + np.finfo('float').eps)
+                
+                to_remove_matched = np.logical_or(is_distractor_class, is_occluded_or_truncated)
+                to_remove_matched = match_cols[to_remove_matched]
+                unmatched_indices = np.delete(unmatched_indices, match_cols, axis=0)
 
+            # For unmatched tracker dets, also remove those that are greater than 50% within a crowd ignore region.
+            if self.filter_ignored_region:
+                crowd_ignore_regions = raw_data['gt_crowd_ignore_regions'][t]
+                unmatched_tracker_dets = tracker_dets[unmatched_indices, :]
+                intersection_with_ignore_region = self._calculate_box_ious(unmatched_tracker_dets, crowd_ignore_regions,
+                                                                       box_format='xywh', do_ioa=True)
+                is_within_crowd_ignore_region = np.any(intersection_with_ignore_region > 0.5 + np.finfo('float').eps, axis=1)
+                to_move_unmatched = unmatched_indices[is_within_crowd_ignore_region]
+                to_remove_tracker = np.concatenate([to_remove_matched, to_move_unmatched], axis=0)
+            else:
+                to_remove_tracker = to_remove_matched
 
             # Apply preprocessing to remove all unwanted tracker dets.
             data['tracker_ids'][t] = np.delete(tracker_ids, to_remove_tracker, axis=0)
@@ -430,11 +519,21 @@ class CustomDataset(_BaseDataset):
             # Remove gt detections marked as to remove (zero marked), and also remove gt detections not in pedestrian
             # class (not applicable for MOT15)
             if self.do_preproc:
-                gt_to_keep_mask = (np.not_equal(gt_zero_marked, 0)) & \
-                                  (np.equal(gt_classes, cls_id))
+                gt_to_keep_mask = np.equal(gt_classes, cls_id)
+                if self.zero_mark:
+                    gt_to_keep_mask = (gt_to_keep_mask) & \
+                                      (np.not_equal(gt_zero_marked, 0))
+                
+                if self.filter_occlusion:
+                    gt_to_keep_mask = (gt_to_keep_mask) & \
+                                      (np.less_equal(gt_occlusion, self.occlusion_thresh)) 
+                
+                if self.filter_truncation:
+                    gt_to_keep_mask = (gt_to_keep_mask) & \
+                                      (np.less_equal(gt_truncation, self.truncation_thresh))
             else:
-                # There are no classes for MOT15
-                gt_to_keep_mask = np.not_equal(gt_zero_marked, 0)
+                gt_to_keep_mask = np.equal(gt_classes, cls_id)
+                
             data['gt_ids'][t] = gt_ids[gt_to_keep_mask]
             data['gt_dets'][t] = gt_dets[gt_to_keep_mask, :]
             data['similarity_scores'][t] = similarity_scores[gt_to_keep_mask]

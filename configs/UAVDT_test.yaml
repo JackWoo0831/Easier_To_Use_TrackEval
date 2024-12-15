@@ -33,11 +33,11 @@ gt_structure_config:
   train_folder_name: UAV-benchmark-M
   test_folder_name: UAV-benchmark-M
   gt_folder_name: gt
-  gt_txt_name: 'gt.txt'  # gt.txt, {seq_name}.txt, etc.
+  gt_txt_name: 'gt_merge.txt'  # gt.txt, {seq_name}.txt, etc.
   gt_loc_format: '{data_root}/{split_name}/{seq_name}/{gt_folder_name}/{gt_txt_name}' 
 
 tracker_structure_config:
-  trackers_folder: './result/fairmot/fairmot_depth_20231212_uavdt_epoch20_none_comp'
+  trackers_folder: './result/distmot/uavdt/txt_results'
   has_split: False
   split_name: ''
   has_tracker_name: False
@@ -47,30 +47,75 @@ tracker_structure_config:
 # other options
 OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  same as TRACKERS_FOLDER)
 
+# ['M0602', 'M1004', 'M1401', 'M1101', 'M1303', 'M0701', 'M0209', 'M1301', 'M0208', 'M0606', 'M1001', 'M0205', 'M1007', 'M0801', 'M0601', 'M0203', 'M0802', 'M0403', 'M1302', 'M1009']
 SEQ_INFO:  # seq_name: seq_length
-  'M0101': 407
-  'M0202': 291
+  'M0602': 480
+  'M1004': 269
+  'M1401': 1050
+  'M1101': 864
+  'M1303': 445
+  'M0701': 1308
+  'M0209': 1576
+  'M1301': 1182
+  'M0208': 265
+  'M0606': 1374
+  'M1001': 1859
+  'M0205': 646
+  'M1007': 659
+  'M0801': 298
+  'M0601': 372
   'M0203': 1007
-  'M0402': 410
-  # 'M0601': 372
-  'M0604': 1079
-  'M1002': 660
-  'M1003': 1346
-  'M1008': 569
-  'M1202': 472
+  'M0802': 1101
+  'M0403': 514
+  'M1302': 719
+  'M1009': 604
 
 # CLASS configs
+CLASS_NAME_TO_CLASS_ID:
+  'car': -1
+  'ignore': 0
+
 CLASSES_TO_EVAL: 
   - 'car'
 
-CLASS_NAME_TO_CLASS_ID:
-  'ignored': 0
-  'car': 1
-
-VALID_CLASS:
-  'car': 1
-
 DISTRACTOR_CLASSES_NAMES:
-  - 'ignored'
+
+# whether to set as single-class evaluation, if set true, then all tracking results are considered as single class
+AS_SINGLE_CLASS:
+  'enabled': false
+  'single_class_id': -1
+
+# zero mark, crowd (i.e. ignored region), occlusion and truncation settings
+# the predicted bounding box in this region or situation can be omitted to get a reasonable results
+
+ZERO_MARK:  # in gt annotation, the 'score' column (idx 6) indicates whether to consider the bbox
+  'enabled': false  # if is 0, then dropped the gt bbox
+
+CROWD_IGNORE_REGION:
+  'enabled': true
+  'col_idx': 7  # in UAVDT the class (col 8 in annotation) 0 indicates the ignored region
+  'class_id': 
+    - '0'  # list format. and the class is str type (because the txt is read as str)
+
+TRUNCATION: # indicates the degree of object parts appears outside a frame. in VisDrone, no truncation = 0 (truncation ratio 0%), and partial truncation = 1 (truncation ratio 1% ~ 50%)
+  'enabled': false  # whether filter the high-trunction objects
+  'thresh': 1  # when > 1, ommited
+
+OCCLUSION:  # indicates the fraction of objects being occluded. in VisDrone, no occlusion = 0 (occlusion ratio 0%), partial occlusion = 1 (occlusion ratio 1% ~ 50%), 
+  # heavy occlusion = 2 (occlusion ratio 50% ~ 100%))
+  'enabled': false  # whether filter the high-trunction objects
+  'thresh': 1  # when > 1, ommited
+
+COL_IDX_MAP:  # in gt file and tracking results file, the meaning of each cols. key: info, value: col idx
+  'time': 0
+  'id': 1 
+  'bbox_start': 2
+  'bbox_end': 5
+  'truncation': 6
+  'occlusion': 7
+  'class': 8
+  'score': 6  # in tracker file
+
+FRAME_START_IDX: 1  # in a seq, the first frame is frame 0 or frame 1 
 
 # python scripts/run_custom_dataset.py --config_path configs/UAVDT_test.yaml

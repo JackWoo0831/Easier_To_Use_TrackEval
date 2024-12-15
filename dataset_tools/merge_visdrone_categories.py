@@ -1,6 +1,15 @@
 """
-merge visdrone class: pedestrain, car, van, truck, bus to a single class. 
-because MOTA can only calculated on One Class.
+The valid class in VisDrone are pedestrain, car, van, truck, bus
+This script merge the 5 class above as ONE VALID class, so that the tracking performance 
+can be evaluated jointly.
+
+The class map:
+
+ignored_regions: 0  # ignored regions is processed separately
+pedestrain, car, van, truck, bus: -1  # valid 5 class
+people: 2  # people as a distractor class
+bicycle, tricycle, awning-tricycle, motor, others: 3  # treat as others
+
 """
 
 import os
@@ -16,17 +25,32 @@ def main(args):
         'test': 'VisDrone2019-MOT-test-dev',
     }
 
+    CLASS_ID_MAP = {
+        0: 0,  # ignored regions is processed separately
+        1: -1,  # valid 5 class
+        4: -1, 
+        5: -1, 
+        6: -1, 
+        9: -1, 
+        2: 2,  # bicycle, tricycle, awning-tricycle, motor, others, treat as others
+        3: 3,
+        7: 3, 
+        8: 3, 
+        10: 3, 
+        11: 3
+
+    }
+
     DATA_ROOT = args.data_root 
     SPLIT = SPLIT_NAME_DICT[args.split]
     STORE_FILE = args.store_file_name
 
-    VALID_CLASS_ID = [1, 4, 5, 6, 9]
     
     if osp.exists(osp.join(DATA_ROOT, STORE_FILE)):
         os.system(f'rm -r {osp.join(DATA_ROOT, STORE_FILE)}')
-    else:
-        os.makedirs(osp.join(DATA_ROOT, STORE_FILE))
-        os.makedirs(osp.join(DATA_ROOT, STORE_FILE, 'annotations'))
+
+    os.makedirs(osp.join(DATA_ROOT, STORE_FILE))
+    os.makedirs(osp.join(DATA_ROOT, STORE_FILE, 'annotations'))
 
     gt_files = os.listdir(osp.join(DATA_ROOT, SPLIT, 'annotations'))
 
@@ -45,16 +69,12 @@ def main(args):
 
             for row in anno:
 
-                if not int(row[6]): continue 
 
                 cls = int(row[7])
-                if cls in VALID_CLASS_ID:
-                    write_line = f'{row[0]},{row[1]},{row[2]},{row[3]},{row[4]},{row[5]},{row[6]},1,{row[8]},{row[9]}\n'
-                    f.write(write_line)
+                new_cls = CLASS_ID_MAP[cls]
 
-                else:
-                    write_line = f'{row[0]},{row[1]},{row[2]},{row[3]},{row[4]},{row[5]},{row[6]},0,{row[8]},{row[9]}\n'
-                    f.write(write_line)            
+                write_line = f'{row[0]},{row[1]},{row[2]},{row[3]},{row[4]},{row[5]},{row[6]},{new_cls},{row[8]},{row[9]}\n'
+                f.write(write_line)
 
         f.close()
 
@@ -72,4 +92,4 @@ if __name__ == '__main__':
 
     main(args)
 
-    # python scripts/merge_visdrone_categories.py
+    # python dataset_tools/merge_visdrone_categories.py

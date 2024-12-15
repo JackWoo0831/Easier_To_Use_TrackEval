@@ -30,14 +30,14 @@ gt_structure_config:
   data_root: '/data/wujiapeng/datasets/VisDrone2019/VisDrone2019/'
   has_split: True
   train_or_test: test
-  train_folder_name: VisDrone2019-MOT-train
-  test_folder_name: VisDrone2019-MOT-val
+  train_folder_name: merge_cls_gt_val
+  test_folder_name: merge_cls_gt_val
   gt_folder_name: annotations
   gt_txt_name: '{seq_name}.txt'  # gt.txt, {seq_name}.txt, etc.
   gt_loc_format: '{data_root}/{split_name}/{gt_folder_name}/{gt_txt_name}' 
 
 tracker_structure_config:
-  trackers_folder: './result/qdtrack/result_txt'
+  trackers_folder: './result/history/qdtrack/qdtrack_yolox_visdrone_val_12epochs'
   has_split: False
   split_name: ''
   has_tracker_name: False
@@ -58,33 +58,22 @@ SEQ_INFO:  # seq_name: seq_length
 
 # CLASS configs
 CLASS_NAME_TO_CLASS_ID:
-  'ignored_regions': 0
-  'pedestrian': 1
+  'ignored regions': 0
+  'valid': -1
   'people': 2
-  'bicycle': 3
-  'car': 4 
-  'van': 5
-  'truck': 6
-  'tricycle': 7
-  'awning-tricycle': 8
-  'bus': 9
-  'motor': 10
-  'others': 11
+  'others': 3
 
 CLASSES_TO_EVAL: 
-  - 'pedestrian'
-  - 'car'
-  - 'van'
-  - 'truck'
-  - 'bus'
+  - 'valid'
 
 DISTRACTOR_CLASSES_NAMES:
-  - 'ignored_regions'
   - 'people'
-  - 'bicycle'
-  - 'motor'
-  - 'awning-tricycle'
   - 'others'
+
+# whether to set as single-class evaluation, if set true, then all tracking results are considered as single class
+AS_SINGLE_CLASS:
+  'enabled': true
+  'single_class_id': -1
 
 # whether to set as single-class evaluation, if set true, then all tracking results are considered as single class
 AS_SINGLE_CLASS:
@@ -124,4 +113,4 @@ COL_IDX_MAP:  # in gt file and tracking results file, the meaning of each cols. 
 
 FRAME_START_IDX: 1  # in a seq, the first frame is frame 0 or frame 1 
   
-# python scripts/run_custom_dataset.py --config_path configs/VisDrone_test_dev.yaml
+# python scripts/run_custom_dataset.py --config_path configs/VisDrone_val_merge_class.yaml

@@ -30,14 +30,14 @@ gt_structure_config:
   data_root: '/data/wujiapeng/datasets/VisDrone2019/VisDrone2019/'
   has_split: True
   train_or_test: test
-  train_folder_name: VisDrone2019-MOT-train
-  test_folder_name: VisDrone2019-MOT-val
+  train_folder_name: merge_cls_gt
+  test_folder_name: merge_cls_gt
   gt_folder_name: annotations
   gt_txt_name: '{seq_name}.txt'  # gt.txt, {seq_name}.txt, etc.
   gt_loc_format: '{data_root}/{split_name}/{gt_folder_name}/{gt_txt_name}' 
 
 tracker_structure_config:
-  trackers_folder: './result/qdtrack/result_txt'
+  trackers_folder: './result/merge_cls_gt/annotations'
   has_split: False
   split_name: ''
   has_tracker_name: False
@@ -48,47 +48,41 @@ tracker_structure_config:
 OUTPUT_FOLDER: './track_eval_output'   # Where to save eval results (if None  same as TRACKERS_FOLDER)
 
 SEQ_INFO:  # seq_name: seq_length
-  'uav0000086_00000_v': 464
-  'uav0000117_02622_v': 349
-  'uav0000137_00458_v': 233
-  'uav0000182_00000_v': 363
-  'uav0000268_05773_v': 978
-  'uav0000305_00000_v': 184
-  'uav0000339_00001_v': 275
+  'uav0000009_03358_v': 219
+  'uav0000073_00600_v': 328
+  'uav0000073_04464_v': 312
+  'uav0000077_00720_v': 780
+  'uav0000088_00290_v': 296
+  'uav0000119_02301_v': 179
+  'uav0000120_04775_v': 1000
+  'uav0000161_00000_v': 308
+  'uav0000188_00000_v': 260
+  'uav0000201_00000_v': 677
+  'uav0000249_00001_v': 360
+  'uav0000249_02688_v': 244
+  'uav0000297_00000_v': 146
+  'uav0000297_02761_v': 373
+  'uav0000306_00230_v': 420
+  'uav0000355_00001_v': 468
+  'uav0000370_00001_v': 265
 
 # CLASS configs
 CLASS_NAME_TO_CLASS_ID:
-  'ignored_regions': 0
-  'pedestrian': 1
+  'ignored regions': 0
+  'valid': -1
   'people': 2
-  'bicycle': 3
-  'car': 4 
-  'van': 5
-  'truck': 6
-  'tricycle': 7
-  'awning-tricycle': 8
-  'bus': 9
-  'motor': 10
-  'others': 11
+  'others': 3
 
 CLASSES_TO_EVAL: 
-  - 'pedestrian'
-  - 'car'
-  - 'van'
-  - 'truck'
-  - 'bus'
+  - 'valid'
 
 DISTRACTOR_CLASSES_NAMES:
-  - 'ignored_regions'
   - 'people'
-  - 'bicycle'
-  - 'motor'
-  - 'awning-tricycle'
   - 'others'
 
 # whether to set as single-class evaluation, if set true, then all tracking results are considered as single class
 AS_SINGLE_CLASS:
-  'enabled': false
+  'enabled': true
   'single_class_id': -1
 
 # zero mark, crowd (i.e. ignored region), occlusion and truncation settings
@@ -123,5 +117,5 @@ COL_IDX_MAP:  # in gt file and tracking results file, the meaning of each cols. 
   'occlusion': 9
 
 FRAME_START_IDX: 1  # in a seq, the first frame is frame 0 or frame 1 
-  
-# python scripts/run_custom_dataset.py --config_path configs/VisDrone_test_dev.yaml
+
+# python scripts/run_custom_dataset.py --config_path configs/VisDrone_test_dev_merge_class.yaml
