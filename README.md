@@ -8,6 +8,8 @@
 
 ## 😆O. 最近更新
 
+***2024.12.21***: 增加DanceTrack数据集支持
+
 ***2024.12.14***: 重新整理整个框架, 并解决了过去没有考虑数据集中ignore region, truncation和occlusion导致FP过高(MOTA过低)的问题[This Issue](https://github.com/JackWoo0831/Easier_To_Use_TrackEval/issues/13#issuecomment-2540488858), 以及支持多类别评测[This Issue](https://github.com/JackWoo0831/Easier_To_Use_TrackEval/issues/19)
 
 ## 😀I. 仓库说明
@@ -101,6 +103,15 @@ python scripts/run_custom_dataset.py --config_path configs/UAVDT_test.yaml
 ```
 <frame id>,<object id>,<top-left-x>,<top-left-y>,<w>,<h>,<confidence score>,-1,...
 ```
+
+### 4. 🗺️DanceTrack
+
+DanceTrack的数据格式和MOT17几乎一致, 只有一个类别. 由于test没有标注, 因此只支持验证集评测:
+
+```bash
+python scripts/run_custom_dataset.py --config_path configs/DanceTrack.yaml
+```
+
 
 ## 😊III. 自定义数据集的评测: Config的解释
 

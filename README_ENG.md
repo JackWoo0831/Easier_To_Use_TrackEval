@@ -8,6 +8,7 @@
 
 ##  😆 O. Recent updates
 
+***December 21, 2024***: Add the support of DanceTrack
 
 ***December 14, 2024***: Reorganized the entire framework and resolved the issue of not considering ignore regions in the dataset in the past, Truncation and occlusion lead to the problem of high FP (low MOTA) [This Issue]（ https://github.com/JackWoo0831/Easier_To_Use_TrackEval/issues/13#issuecomment -2540488858), as well as support for multi category reviews [This Issue]（ https://github.com/JackWoo0831/Easier_To_Use_TrackEval/issues/19 )
 
@@ -103,6 +104,15 @@ Please ensure that each line of your tracking results follows the following form
 ```
 <frame id>,< object id>,<top-left-x>,<top-left-y>,<w>,<h>,<confidence score>,-1,...
 ```
+
+### 4. 🗺️DanceTrack
+
+The data format of ODanceTrack is almost identical to MT17, with only one category. Due to the lack of annotation in the test, only validation set evaluation is supported:
+
+```bash
+python scripts/run_custom_dataset.py --config_path configs/DanceTrack.yaml
+```
+
 
 ##  😊 III. Evaluation of custom datasets: Explanation of Config
 
